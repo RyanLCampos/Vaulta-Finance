@@ -12,7 +12,19 @@ export default createGlobalStyle`
 
     body {
         font-family: "Rubik", sans-serif;
-        background: #ffffff;
-        background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(214, 210, 210, 1) 54%, rgba(186, 186, 186, 1) 100%);
+        min-height: 100vh;
+        background: #427561;
+        background: linear-gradient(90deg,rgba(66, 117, 97, 1) 0%, rgba(87, 199, 133, 1) 50%, rgb(34, 217, 2) 100%);
     }
-`
+    
+    .cards {
+        background-color: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .recharts-wrapper:focus,
+    .recharts-wrapper *:focus {
+    outline: none;
+    }
+    
+`;
