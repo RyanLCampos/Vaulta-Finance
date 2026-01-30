@@ -1,18 +1,22 @@
 import { ThemeProvider } from "@material-tailwind/react";
 
 /* Styles */
-import './index.css'
-import Global from './styles/Global'
+import "./index.css";
+import Global from "./styles/Global";
 
-/* Components */
-import { SidebarWithBurgerMenu } from './components/SideBar'
+/* Layout */
+import MainLayout from "./layouts/MainLayout";
+
+/* Pages */
+import Dashboard from "./pages/Dashboard.jsx";
 
 export function App() {
-
   return (
     <ThemeProvider>
-      <SidebarWithBurgerMenu />
       <Global />
+      <MainLayout>
+        <Dashboard />
+      </MainLayout>
     </ThemeProvider>
-  )
+  );
 }
