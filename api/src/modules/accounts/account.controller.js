@@ -24,14 +24,19 @@ export async function findAllAccounts(req, res) {
 
 export async function findAccountById(req, res) {
   const { id } = req.params;
+  const userId = req.userId;
 
-  const account = await AccountService.findById(Number(id), req.userId);
+  try {
+    const account = await AccountService.findById(Number(id), userId);
 
-  if (!account) {
-    return res.status(404).json({ message: "Account not found" });
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    return res.json(account);
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
   }
-
-  return res.json(account);
 }
 
 export async function updateAccount(req, res) {

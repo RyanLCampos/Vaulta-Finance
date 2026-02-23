@@ -5,6 +5,17 @@ export async function create({ name, type, balance = 0, userId }) {
     throw new Error("Name and type are required");
   }
 
+  const accountsCount = await prisma.account.count({
+    where: {
+      userId,
+      active: true,
+    },
+  });
+
+  if (accountsCount >= 3) {
+    throw new Error("Account limit reached");
+  }
+
   return prisma.account.create({
     data: {
       name,
@@ -40,6 +51,10 @@ export async function findAllByUser(userId) {
 }
 
 export async function findById(id, userId) {
+  if (!id) {
+    throw new Error("Account id is required");
+  }
+
   return prisma.account.findFirst({
     where: {
       id,
@@ -57,12 +72,20 @@ export async function findById(id, userId) {
 }
 
 export async function updateAccount(id, userId, data) {
-  return prisma.account.update({
+  const account = await prisma.account.findFirst({
     where: {
       id,
       userId,
       active: true,
     },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
+  }
+
+  return prisma.account.update({
+    where: { id },
     data,
     select: {
       id: true,
@@ -75,12 +98,20 @@ export async function updateAccount(id, userId, data) {
 }
 
 export async function deleteAccount(id, userId) {
-  return prisma.account.update({
+  const account = await prisma.account.findFirst({
     where: {
       id,
       userId,
       active: true,
     },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
+  }
+
+  return prisma.account.update({
+    where: { id },
     data: {
       active: false,
     },

@@ -9,11 +9,6 @@ export async function createUser(req, res) {
   }
 }
 
-export async function findAllUsers(req, res) {
-  const users = await UserService.findAll();
-  return res.json(users);
-}
-
 export async function findUserById(req, res) {
   const { id } = req.params;
 

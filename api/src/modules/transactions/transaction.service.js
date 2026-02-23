@@ -16,13 +16,13 @@ export async function createTransaction(
   }
 
   const decimalAmount = new Prisma.Decimal(amount);
-
   const transactionDate = date ? new Date(date) : new Date();
 
   const account = await prisma.account.findFirst({
     where: {
       id: accountId,
       userId,
+      active: true,
     },
   });
 
@@ -33,7 +33,7 @@ export async function createTransaction(
   const category = await prisma.category.findFirst({
     where: {
       id: categoryId,
-      userId,
+      accountId,
       active: true,
     },
   });
@@ -53,7 +53,6 @@ export async function createTransaction(
         amount: decimalAmount,
         type,
         date: transactionDate,
-        userId,
         accountId,
         categoryId,
       },
@@ -63,9 +62,7 @@ export async function createTransaction(
       type === "INCOME" ? decimalAmount : decimalAmount.mul(-1);
 
     await tx.account.update({
-      where: {
-        id: accountId,
-      },
+      where: { id: accountId },
       data: {
         balance: {
           increment: balanceChange,
@@ -77,11 +74,22 @@ export async function createTransaction(
   });
 }
 
-export async function findAllTransactions(userId, filters = {}) {
+export async function findAllTransactions(accountId, userId, filters = {}) {
+  const account = await prisma.account.findFirst({
+    where: {
+      id: accountId,
+      userId,
+      active: true,
+    },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
+  }
+
   return prisma.transaction.findMany({
     where: {
-      userId,
-      ...(filters.accountId && { accountId: Number(filters.accountId) }),
+      accountId,
       ...(filters.categoryId && { categoryId: Number(filters.categoryId) }),
       ...(filters.type && { type: filters.type }),
       ...(filters.startDate &&
@@ -102,14 +110,12 @@ export async function findAllTransactions(userId, filters = {}) {
       date: true,
       type: true,
       createdAt: true,
-
       account: {
         select: {
           id: true,
           name: true,
         },
       },
-
       category: {
         select: {
           id: true,
@@ -120,11 +126,23 @@ export async function findAllTransactions(userId, filters = {}) {
   });
 }
 
-export async function findTransactionById(id, userId) {
+export async function findTransactionById(id, accountId, userId) {
+  const account = await prisma.account.findFirst({
+    where: {
+      id: accountId,
+      userId,
+      active: true,
+    },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
+  }
+
   return prisma.transaction.findFirst({
     where: {
       id,
-      userId,
+      accountId,
     },
     select: {
       id: true,

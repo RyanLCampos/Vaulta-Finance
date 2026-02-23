@@ -1,15 +1,28 @@
 import prisma from "../../shared/database/prisma.js";
 
-export async function createCategory({ name, type, userId }) {
-  if (!name || !type) {
-    throw new Error("Name and type are required");
+export async function createCategory({ name, type, accountId, userId }) {
+  if (!name || !type || !accountId) {
+    throw new Error("Name, type and accountId are required");
+  }
+
+  // 🔐 valida acesso à account
+  const account = await prisma.account.findFirst({
+    where: {
+      id: accountId,
+      userId,
+      active: true,
+    },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
   }
 
   return prisma.category.create({
     data: {
       name,
       type,
-      userId,
+      accountId,
     },
     select: {
       id: true,
@@ -21,10 +34,26 @@ export async function createCategory({ name, type, userId }) {
   });
 }
 
-export async function findAll(userId) {
+export async function findAll(accountId, userId) {
+  if (!accountId) {
+    throw new Error("Account not provided");
+  }
+
+  const account = await prisma.account.findFirst({
+    where: {
+      id: accountId,
+      userId,
+      active: true,
+    },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
+  }
+
   return prisma.category.findMany({
     where: {
-      userId,
+      accountId,
       active: true,
     },
     select: {
@@ -39,11 +68,23 @@ export async function findAll(userId) {
   });
 }
 
-export async function findById(id, userId) {
+export async function findById(id, accountId, userId) {
+  const account = await prisma.account.findFirst({
+    where: {
+      id: accountId,
+      userId,
+      active: true,
+    },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
+  }
+
   return prisma.category.findFirst({
     where: {
       id,
-      userId,
+      accountId,
       active: true,
     },
     select: {
@@ -55,13 +96,21 @@ export async function findById(id, userId) {
   });
 }
 
-export async function updateCategory(id, userId, data) {
-  return prisma.category.update({
+export async function updateCategory(id, accountId, userId, data) {
+  const account = await prisma.account.findFirst({
     where: {
-      id,
+      id: accountId,
       userId,
       active: true,
     },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
+  }
+
+  return prisma.category.update({
+    where: { id },
     data,
     select: {
       id: true,
@@ -72,13 +121,21 @@ export async function updateCategory(id, userId, data) {
   });
 }
 
-export async function deleteCategory(id, userId) {
-  return prisma.category.update({
+export async function deleteCategory(id, accountId, userId) {
+  const account = await prisma.account.findFirst({
     where: {
-      id,
+      id: accountId,
       userId,
       active: true,
     },
+  });
+
+  if (!account) {
+    throw new Error("Account not found");
+  }
+
+  return prisma.category.update({
+    where: { id },
     data: {
       active: false,
     },

@@ -16,39 +16,38 @@ export async function create({ name, email, password }) {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  return prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      createdAt: true,
-    },
-  });
-}
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
+    });
 
-export async function findAll() {
-  return prisma.user.findMany({
-    where: {
-      active: true,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      createdAt: true,
-    },
+    await tx.account.create({
+      data: {
+        name: "Conta principal",
+        type: "DEFAULT",
+        balance: 0,
+        userId: user.id,
+      },
+    });
+
+    return user;
   });
 }
 
 export async function findById(userId) {
   return prisma.user.findUnique({
     where: {
-      id: userId
+      id: userId,
     },
     select: {
       id: true,

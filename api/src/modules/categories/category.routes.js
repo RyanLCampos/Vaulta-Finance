@@ -1,5 +1,4 @@
 import { Router } from "express";
-
 import { authMiddleware } from "../../shared/middleware/auth.middleware.js";
 import {
   createCategory,
@@ -9,7 +8,7 @@ import {
   updateCategory,
 } from "./category.controller.js";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 router.post("/", authMiddleware, createCategory);
 router.get("/", authMiddleware, findAllCategories);
