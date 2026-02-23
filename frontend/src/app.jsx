@@ -1,22 +1,25 @@
+import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@material-tailwind/react";
 
 /* Styles */
 import "./index.css";
 import Global from "./styles/Global";
 
-/* Layout */
-import MainLayout from "./layouts/MainLayout";
+/* Context */
+import { AuthProvider } from "./context/AuthContext";
 
-/* Pages */
-import Dashboard from "./pages/Dashboard.jsx";
+/* Routes */
+import AppRoutes from "./routes/AppRoutes";
 
 export function App() {
   return (
     <ThemeProvider>
-      <Global />
-      <MainLayout>
-        <Dashboard />
-      </MainLayout>
+      <BrowserRouter>
+        <AuthProvider>
+          <Global />
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
