@@ -10,7 +10,7 @@ export default withMT({
   theme: {
     extend: {
       colors: {
-        primary: "#427549", // verde principal
+        primary: "#43854c", // verde principal
         secondary: "#64748b", // vermelho para despesas
         info: "#1e3a8a", // azul para saldo
         neutral: "#f5f5f5", // fundo neutro
